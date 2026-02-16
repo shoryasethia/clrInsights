@@ -35,12 +35,6 @@ graph TD
     I -->|No| K[generate_viz]
     K --> H[answer]
     H --> L[END]
-
-    style B fill:#4f46e5,color:#fff
-    style E fill:#7c3aed,color:#fff
-    style K fill:#059669,color:#fff
-    style H fill:#0284c7,color:#fff
-    style G fill:#dc2626,color:#fff
 ```
 
 ## Project Structure
