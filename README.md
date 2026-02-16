@@ -132,15 +132,15 @@ npm run dev
 
 ### LLM Models
 
-https://github.com/shoryasethia/clrInsights/blob/f1ce9ec416de116374f8e1892bf30781e1cb7302/.env.example#L5-L10
+https://github.com/shoryasethia/clrInsights/blob/main/.env.example#L5-L10
 
 ### Data Paths
 
-https://github.com/shoryasethia/clrInsights/blob/f1ce9ec416de116374f8e1892bf30781e1cb7302/.env.example#L12-L15
+https://github.com/shoryasethia/clrInsights/blob/main/.env.example#L12-L15
 
 ### API Settings
 
-https://github.com/shoryasethia/clrInsights/blob/f1ce9ec416de116374f8e1892bf30781e1cb7302/.env.example#L21-L24
+https://github.com/shoryasethia/clrInsights/blob/main/.env.example#L21-L24
 
 ### Additional Settings
 See `.env.example` for all available configuration options including:
