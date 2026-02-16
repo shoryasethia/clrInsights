@@ -24,6 +24,13 @@ matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 import matplotlib.ticker as ticker
 import numpy as np
+import scipy.stats as stats
+import seaborn as sns
+import statsmodels.api as sm
+import math
+import datetime
+import textwrap
+from collections import Counter, defaultdict
 
 # --- Data injected by the executor ---
 DATA = {data_json}
@@ -61,6 +68,30 @@ for _fig_num in plt.get_fignums():
 # Output as JSON to stdout
 print("__CHART_OUTPUT__" + json.dumps({"images": _images}))
 '''
+
+
+def _sanitize_error(stderr: str) -> str:
+    """
+    Extract a clean, user-friendly error message from Python traceback stderr.
+    Strips temp file paths and line numbers, returns just the error type + message.
+    """
+    import re as _re
+    lines = stderr.strip().splitlines()
+    if not lines:
+        return "Unknown chart error"
+    
+    # Find the last line that looks like an exception (e.g., "KeyError: 'sender'")
+    for line in reversed(lines):
+        stripped = line.strip()
+        # Match common Python exception patterns: ErrorType: message
+        if _re.match(r'^[A-Z]\w*(Error|Exception|Warning)', stripped):
+            return stripped[:300]
+    
+    # If no exception line found, return the last non-empty line (cleaned)
+    last = lines[-1].strip()
+    # Strip file path references
+    last = _re.sub(r'File "[^"]*"', 'File "<chart>"', last)
+    return last[:300] if last else "Chart generation failed"
 
 
 def execute_chart_code(
@@ -109,7 +140,7 @@ def execute_chart_code(
         if result.returncode != 0:
             return {
                 'images': [],
-                'error': f"Chart code failed: {stderr[:500]}"
+                'error': f"Chart code failed: {_sanitize_error(stderr)}"
             }
         
         # Extract chart output
@@ -124,7 +155,7 @@ def execute_chart_code(
         else:
             return {
                 'images': [],
-                'error': f"No chart output produced. stderr: {stderr[:300]}"
+                'error': f"No chart output produced. {_sanitize_error(stderr)}"
             }
     
     except subprocess.TimeoutExpired:

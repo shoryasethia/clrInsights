@@ -125,14 +125,29 @@ async def chat(request: ChatRequest):
     
     except Exception as e:
         error_msg = str(e)
-        # Provide helpful error messages for common issues
-        if "API key" in error_msg or "INVALID_ARGUMENT" in error_msg:
-            error_msg = f"API Key Error: Please configure valid API keys in the .env file. Current error: {error_msg}"
+        status_code = 500
         
-        raise HTTPException(
-            status_code=500 if "API key" not in error_msg else 400,
-            detail=error_msg
-        )
+        # Categorize errors for user-friendly messages
+        if "API key" in error_msg or "INVALID_ARGUMENT" in error_msg or "API_KEY_INVALID" in error_msg:
+            error_msg = "Invalid API key. Please update your key in Settings."
+            status_code = 401
+        elif "rate" in error_msg.lower() and "limit" in error_msg.lower():
+            error_msg = "Rate limit reached. Please wait a moment and try again."
+            status_code = 429
+        elif "quota" in error_msg.lower():
+            error_msg = "API quota exceeded. Check your plan or try a different provider in Settings."
+            status_code = 429
+        elif "timeout" in error_msg.lower() or "timed out" in error_msg.lower():
+            error_msg = "Request timed out. Try a simpler query or try again."
+            status_code = 504
+        elif "Could not parse" in error_msg or "JSONDecodeError" in error_msg:
+            error_msg = "The AI returned an unexpected response. Please try rephrasing your question."
+            status_code = 500
+        elif "connection" in error_msg.lower() or "connect" in error_msg.lower():
+            error_msg = "Could not connect to the AI provider. Check your internet connection."
+            status_code = 502
+        
+        raise HTTPException(status_code=status_code, detail=error_msg)
 
 
 @app.get("/sessions")

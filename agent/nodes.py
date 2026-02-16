@@ -456,11 +456,16 @@ AVAILABLE (already imported — do NOT re-import these):
 - matplotlib.pyplot as plt
 - matplotlib.ticker as ticker
 - numpy as np
+- scipy.stats as stats
+- seaborn as sns
+- statsmodels.api as sm
+- math, datetime, textwrap
+- collections.Counter, collections.defaultdict
 - DATA dict with your query results
 
 FORBIDDEN:
 - NEVER call plt.show() — figures are captured automatically.
-- NEVER import matplotlib, numpy, or any other library — they are pre-imported.
+- NEVER import matplotlib, numpy, scipy, pandas, seaborn, statsmodels, or any other library — they are pre-imported.
 
 COLOR PALETTE: '#4285F4', '#EA4335', '#FBBC04', '#34A853', '#FF6D01', '#46BDC6', '#7B61FF'
 
@@ -485,7 +490,16 @@ Write matplotlib code to visualize this data appropriately. Decide how many char
         code = re.sub(r'^\s*plt\.show\(\)\s*$', '', code, flags=re.MULTILINE)
         code = re.sub(r'^\s*import\s+matplotlib.*$', '', code, flags=re.MULTILINE)
         code = re.sub(r'^\s*import\s+numpy.*$', '', code, flags=re.MULTILINE)
+        code = re.sub(r'^\s*import\s+scipy.*$', '', code, flags=re.MULTILINE)
+        code = re.sub(r'^\s*import\s+pandas.*$', '', code, flags=re.MULTILINE)
+        code = re.sub(r'^\s*import\s+seaborn.*$', '', code, flags=re.MULTILINE)
+        code = re.sub(r'^\s*import\s+statsmodels.*$', '', code, flags=re.MULTILINE)
         code = re.sub(r'^\s*from\s+matplotlib.*$', '', code, flags=re.MULTILINE)
+        code = re.sub(r'^\s*from\s+scipy.*$', '', code, flags=re.MULTILINE)
+        code = re.sub(r'^\s*from\s+pandas.*$', '', code, flags=re.MULTILINE)
+        code = re.sub(r'^\s*from\s+seaborn.*$', '', code, flags=re.MULTILINE)
+        code = re.sub(r'^\s*from\s+statsmodels.*$', '', code, flags=re.MULTILINE)
+        code = re.sub(r'^\s*from\s+collections.*$', '', code, flags=re.MULTILINE)
         
         trace.append({
             'step': 'Visualization code generation',
@@ -501,36 +515,64 @@ Write matplotlib code to visualize this data appropriately. Decide how many char
         # Execute the chart code in a sandboxed subprocess
         result = execute_chart_code(code, data_payload, timeout=30)
         
-        if result['error']:
+        # Auto-fix loop: retry up to 2 times on failure
+        fix_attempts = 0
+        max_fix_attempts = 2
+        current_code = code
+        
+        while result['error'] and fix_attempts < max_fix_attempts:
+            fix_attempts += 1
             trace.append({
-                'step': f"Chart code failed: {result['error'][:200]}",
+                'step': f"Chart error (attempt {fix_attempts}): {result['error']}",
                 'type': 'error',
                 'prompt': None,
                 'response': None
             })
-            # Try to auto-fix once
+            
+            # Build data shape info for the LLM
+            data_shape = {}
+            for k, v in data_payload.items():
+                if v:
+                    data_shape[k] = {
+                        'columns': list(v[0].keys()),
+                        'sample_row': v[0],
+                        'num_rows': len(v)
+                    }
+                else:
+                    data_shape[k] = {'columns': [], 'sample_row': {}, 'num_rows': 0}
+            
             fix_prompt = f"""The following matplotlib code failed with an error. Fix it.
 
 CODE:
-{code}
+{current_code}
 
 ERROR:
 {result['error']}
 
-DATA KEYS: {list(data_payload.keys())}
-DATA COLUMNS: {{{', '.join(f"'{k}': {list(v[0].keys()) if v else '[]'}" for k, v in data_payload.items())}}}
+DATA SHAPE:
+{json.dumps(data_shape, default=str, indent=2)}
+
+RULES:
+- Use exact column names from DATA SHAPE above.
+- Do NOT import any libraries — matplotlib, numpy, pandas, scipy, seaborn, statsmodels are already imported.
+- Do NOT call plt.show().
 
 Return ONLY the fixed Python code. No markdown, no explanation."""
             
             fixed_response = await client.generate(fix_prompt, system_prompt)
             fixed_code = fixed_response.strip().removeprefix('```python').removeprefix('```').removesuffix('```').strip()
+            # Strip imports from fix too
+            fixed_code = re.sub(r'^\s*import\s+\w.*$', '', fixed_code, flags=re.MULTILINE)
+            fixed_code = re.sub(r'^\s*from\s+\w.*$', '', fixed_code, flags=re.MULTILINE)
+            fixed_code = re.sub(r'^\s*plt\.show\(\)\s*$', '', fixed_code, flags=re.MULTILINE)
             
             if fixed_code.strip() and fixed_code.strip() != 'pass':
+                current_code = fixed_code
                 result = execute_chart_code(fixed_code, data_payload, timeout=30)
         
         if result['images']:
             trace.append({
-                'step': f"Generated {len(result['images'])} chart(s)",
+                'step': f"Generated {len(result['images'])} chart(s)" + (f" (after {fix_attempts} fix{'es' if fix_attempts > 1 else ''})" if fix_attempts else ''),
                 'type': 'viz',
                 'prompt': None,
                 'response': None
@@ -539,6 +581,15 @@ Return ONLY the fixed Python code. No markdown, no explanation."""
                 **state,
                 'visualizations': list(state.get('visualizations', [])) + result['images']
             }
+        
+        # All retries exhausted — log final error
+        if result['error']:
+            trace.append({
+                'step': f"Chart generation failed after {fix_attempts} fix attempt(s): {result['error']}",
+                'type': 'error',
+                'prompt': None,
+                'response': None
+            })
         
         return state
     

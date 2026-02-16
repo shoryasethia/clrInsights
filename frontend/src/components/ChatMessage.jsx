@@ -9,7 +9,7 @@ function TraceCopyBtn({ text }) {
       await navigator.clipboard.writeText(text)
       setCopied(true)
       setTimeout(() => setCopied(false), 1500)
-    } catch {}
+    } catch { }
   }
   return (
     <button onClick={copy} className="p-1 rounded hover:bg-gray-200 dark:hover:bg-gray-700 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors" title={copied ? 'Copied!' : 'Copy'}>
@@ -43,13 +43,12 @@ function TraceSection({ steps }) {
             <div className="flex-1 min-w-0">
               <div className="text-xs text-gray-600 dark:text-gray-400 leading-snug">{step.text || step.step}</div>
               {step.type && (
-                <span className={`inline-block mt-1 px-1.5 py-0.5 rounded text-[10px] leading-none ${
-                  step.type === 'prompt' ? 'bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400' :
-                  step.type === 'response' ? 'bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400' :
-                  step.type === 'sql' ? 'bg-purple-100 dark:bg-purple-900/30 text-purple-700 dark:text-purple-400' :
-                  step.type === 'error' ? 'bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-400' :
-                  'bg-gray-200 dark:bg-gray-700 text-gray-600 dark:text-gray-400'
-                }`}>
+                <span className={`inline-block mt-1 px-1.5 py-0.5 rounded text-[10px] leading-none ${step.type === 'prompt' ? 'bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400' :
+                    step.type === 'response' ? 'bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400' :
+                      step.type === 'sql' ? 'bg-purple-100 dark:bg-purple-900/30 text-purple-700 dark:text-purple-400' :
+                        step.type === 'error' ? 'bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-400' :
+                          'bg-gray-200 dark:bg-gray-700 text-gray-600 dark:text-gray-400'
+                  }`}>
                   {step.type}
                 </span>
               )}
@@ -113,17 +112,16 @@ export default function ChatMessage({ message }) {
   return (
     <div className={`flex gap-3 ${isUser ? 'message-user' : 'message-assistant'}`}>
       {/* Avatar */}
-      <div className={`w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 ${
-        isUser 
-          ? 'bg-primary-700 text-white' 
+      <div className={`w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 ${isUser
+          ? 'bg-primary-700 text-white'
           : 'bg-gray-200 dark:bg-gray-800 text-gray-700 dark:text-gray-300'
-      }`}>
+        }`}>
         {isUser ? <User className="w-5 h-5" /> : <Bot className="w-5 h-5" />}
       </div>
 
       {/* Message Content */}
       <div className="flex-1 min-w-0 group/msg">
-        <div className={`message-content relative ${isUser ? 'bg-primary-50 dark:bg-[#181818]' : 'bg-gray-50 dark:bg-[#181818]'}`}>
+        <div className={`message-content relative ${isUser ? 'bg-primary-50 dark:bg-[#1a1a2e]' : 'bg-gray-50 dark:bg-[#141414]'}`}>
           {/* Copy button — visible on hover */}
           {message.content && (
             <button
@@ -175,8 +173,8 @@ export default function ChatMessage({ message }) {
                     style={{ width: visualizations.length === 1 ? 'clamp(160px, 50%, 360px)' : 'clamp(140px, 45%, 280px)' }}
                     onClick={() => setViewerImage(imgSrc)}
                   >
-                    <img 
-                      src={imgSrc} 
+                    <img
+                      src={imgSrc}
                       alt={`Chart ${idx + 1}`}
                       className="w-full h-auto block"
                     />

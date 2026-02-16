@@ -8,6 +8,9 @@ google-genai
 groq
 duckdb
 matplotlib
+scipy
+seaborn
+statsmodels
 plotly
 pydantic
 pydantic-settings

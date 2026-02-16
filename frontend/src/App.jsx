@@ -81,7 +81,8 @@ function App() {
       } else {
         setMessages([])
       }
-    } catch {
+    } catch (err) {
+      console.error('[Sessions] Failed to load history:', err)
       setMessages([])
     }
   }
@@ -90,10 +91,10 @@ function App() {
     // Delete from backend (removes folder)
     try {
       await fetch(`/api/sessions/${id}`, { method: 'DELETE' })
-    } catch {
-      // ignore
+    } catch (err) {
+      console.error('[Sessions] Failed to delete session:', err)
     }
-    
+
     setSessions(prev => prev.filter(s => s.id !== id))
     if (sessionId === id) {
       const remaining = sessions.filter(s => s.id !== id)
@@ -115,8 +116,8 @@ function App() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ title: newTitle })
       })
-    } catch {
-      // ignore
+    } catch (err) {
+      console.error('[Sessions] Failed to rename session:', err)
     }
   }
 
@@ -128,7 +129,7 @@ function App() {
     setMessages(prev => [...prev, userMessage])
     setInput('')
     setLoading(true)
-    
+
     // Auto-name session from first message (only if not manually renamed)
     if (messages.length === 0 && sessionId && !renamedSessions.has(sessionId)) {
       const title = currentInput.slice(0, 50) + (currentInput.length > 50 ? '...' : '')
@@ -140,7 +141,9 @@ function App() {
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ title })
         })
-      } catch {}
+      } catch (err) {
+        console.error('[Sessions] Failed to auto-name session:', err)
+      }
     }
 
     try {
@@ -187,10 +190,16 @@ function App() {
 
       setMessages(prev => [...prev, assistantMessage])
     } catch (error) {
+      console.error('[Chat] Request failed:', error)
+      const userFriendly = error.message?.includes('Failed to fetch')
+        ? 'Could not connect to server. Is the backend running?'
+        : error.message?.includes('API Key')
+          ? 'API key issue — check your keys in Settings.'
+          : `Failed to process query: ${error.message}`
       const errorMessage = {
         role: 'assistant',
         content: '',
-        error: `Failed to process query: ${error.message}`
+        error: userFriendly
       }
       setMessages(prev => [...prev, errorMessage])
     } finally {
@@ -211,10 +220,10 @@ function App() {
       <header className="bg-white dark:bg-[#181818] border-b border-gray-200 dark:border-gray-900 z-20">
         <div className="px-4 h-16 flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <img 
-              src="/assets/clrinsights-logo.png" 
-              alt="CLRInsights" 
-              className="h-8 w-auto rounded-lg"
+            <img
+              src="/assets/clrinsights-logo.png"
+              alt="CLRInsights"
+              className="h-10 w-auto rounded-lg"
             />
             {!showSidebar && (
               <button
@@ -283,8 +292,8 @@ function App() {
                 <div className="flex-1 px-4 py-3 rounded-lg bg-gray-50 dark:bg-[#181818]">
                   <div className="flex gap-1">
                     <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce"></div>
-                    <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{animationDelay: '0.1s'}}></div>
-                    <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{animationDelay: '0.2s'}}></div>
+                    <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '0.1s' }}></div>
+                    <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '0.2s' }}></div>
                   </div>
                 </div>
               </div>

@@ -87,10 +87,21 @@ export default function Settings({ isOpen, onClose, settings, onSettingsChange }
   const loadKeys = async () => {
     try {
       const res = await fetch('/api/settings/keys')
-      if (res.ok) setMaskedKeys(await res.json())
-    } catch {}
+      if (res.ok) {
+        const data = await res.json()
+        setMaskedKeys(data)
+      } else {
+        console.error('[Settings] Failed to load keys:', res.status, res.statusText)
+      }
+    } catch (err) {
+      console.error('[Settings] Error fetching keys:', err)
+    }
   }
 
+  // Eagerly load keys on mount so they are ready when dialog opens
+  useEffect(() => { loadKeys() }, [])
+
+  // Reload keys every time the dialog is opened (in case they were changed)
   useEffect(() => {
     if (isOpen) loadKeys()
   }, [isOpen])
