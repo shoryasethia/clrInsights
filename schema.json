@@ -1,0 +1,245 @@
+{
+  "table_name": "upi_transactions_2024",
+  "description": "Digital payment transaction records for UPI (Unified Payments Interface) in India for 2024",
+  "total_records": 250000,
+  "columns": [
+    {
+      "name": "transaction_id",
+      "type": "STRING",
+      "description": "Unique identifier for each transaction in format TXN followed by 10 digits",
+      "example": "TXN0000000001",
+      "nullable": false,
+      "primary_key": true
+    },
+    {
+      "name": "timestamp",
+      "type": "TIMESTAMP",
+      "description": "Date and time when the transaction occurred in format YYYY-MM-DD HH:MM:SS",
+      "example": "2024-10-08 15:17:28",
+      "nullable": false,
+      "range": "2024-01-01 to 2024-12-31"
+    },
+    {
+      "name": "transaction_type",
+      "type": "STRING",
+      "description": "Type of transaction indicating the nature of payment",
+      "example": "P2P",
+      "nullable": false,
+      "valid_values": [
+        "P2P - Person to Person transfer",
+        "P2M - Person to Merchant payment",
+        "Bill Payment - Utility or service bill payment",
+        "Recharge - Mobile or service recharge"
+      ]
+    },
+    {
+      "name": "merchant_category",
+      "type": "STRING",
+      "description": "Category of merchant or expense type. NULL for P2P transactions since no merchant is involved",
+      "example": "Grocery",
+      "nullable": true,
+      "null_condition": "Always NULL when transaction_type is P2P",
+      "valid_values": [
+        "Grocery",
+        "Food",
+        "Shopping",
+        "Entertainment",
+        "Fuel",
+        "Healthcare",
+        "Utilities",
+        "Transport",
+        "Education",
+        "Other"
+      ]
+    },
+    {
+      "name": "amount_(INR)",
+      "type": "INTEGER",
+      "description": "Transaction amount in Indian Rupees",
+      "example": 868,
+      "nullable": false,
+      "range": "Typically 16 to 20396 INR",
+      "unit": "INR"
+    },
+    {
+      "name": "transaction_status",
+      "type": "STRING",
+      "description": "Final status of the transaction",
+      "example": "SUCCESS",
+      "nullable": false,
+      "valid_values": [
+        "SUCCESS - Transaction completed successfully",
+        "FAILED - Transaction did not complete"
+      ]
+    },
+    {
+      "name": "sender_age_group",
+      "type": "STRING",
+      "description": "Age range of the person initiating the transaction",
+      "example": "26-35",
+      "nullable": false,
+      "valid_values": [
+        "18-25",
+        "26-35",
+        "36-45",
+        "46-55",
+        "56+"
+      ]
+    },
+    {
+      "name": "receiver_age_group",
+      "type": "STRING",
+      "description": "Age range of the person receiving the payment. NULL for non-P2P transactions",
+      "example": "18-25",
+      "nullable": true,
+      "null_condition": "NULL when transaction_type is not P2P (i.e., for P2M, Bill Payment, Recharge)",
+      "valid_values": [
+        "18-25",
+        "26-35",
+        "36-45",
+        "46-55",
+        "56+"
+      ]
+    },
+    {
+      "name": "sender_state",
+      "type": "STRING",
+      "description": "Indian state where the sender is located",
+      "example": "Delhi",
+      "nullable": false,
+      "valid_values": [
+        "Delhi",
+        "Maharashtra",
+        "Karnataka",
+        "Gujarat",
+        "Tamil Nadu",
+        "Uttar Pradesh",
+        "Rajasthan",
+        "Telangana",
+        "West Bengal",
+        "Andhra Pradesh"
+      ]
+    },
+    {
+      "name": "sender_bank",
+      "type": "STRING",
+      "description": "Bank of the transaction sender",
+      "example": "Axis",
+      "nullable": false,
+      "valid_values": [
+        "SBI - State Bank of India",
+        "HDFC",
+        "ICICI",
+        "Axis",
+        "Kotak - Kotak Mahindra Bank",
+        "Yes Bank",
+        "IndusInd",
+        "PNB - Punjab National Bank"
+      ]
+    },
+    {
+      "name": "receiver_bank",
+      "type": "STRING",
+      "description": "Bank of the transaction receiver",
+      "example": "SBI",
+      "nullable": false,
+      "valid_values": [
+        "SBI - State Bank of India",
+        "HDFC",
+        "ICICI",
+        "Axis",
+        "Kotak - Kotak Mahindra Bank",
+        "Yes Bank",
+        "IndusInd",
+        "PNB - Punjab National Bank"
+      ]
+    },
+    {
+      "name": "device_type",
+      "type": "STRING",
+      "description": "Type of device used to initiate the transaction",
+      "example": "Android",
+      "nullable": false,
+      "valid_values": [
+        "Android",
+        "iOS",
+        "Web"
+      ]
+    },
+    {
+      "name": "network_type",
+      "type": "STRING",
+      "description": "Type of internet connection used during transaction",
+      "example": "4G",
+      "nullable": false,
+      "valid_values": [
+        "3G",
+        "4G",
+        "5G",
+        "WiFi"
+      ]
+    },
+    {
+      "name": "fraud_flag",
+      "type": "INTEGER",
+      "description": "Binary flag indicating if transaction was flagged for review. 0 means not flagged, 1 means flagged. IMPORTANT: This indicates flagged for review, NOT confirmed fraud",
+      "example": 0,
+      "nullable": false,
+      "valid_values": [
+        "0 - Not flagged for review",
+        "1 - Flagged for review (does not mean confirmed fraud)"
+      ]
+    },
+    {
+      "name": "hour_of_day",
+      "type": "INTEGER",
+      "description": "Hour of the day when transaction occurred (24-hour format, 0-23)",
+      "example": 15,
+      "nullable": false,
+      "range": "0 to 23"
+    },
+    {
+      "name": "day_of_week",
+      "type": "STRING",
+      "description": "Day of the week when transaction occurred",
+      "example": "Tuesday",
+      "nullable": false,
+      "valid_values": [
+        "Monday",
+        "Tuesday",
+        "Wednesday",
+        "Thursday",
+        "Friday",
+        "Saturday",
+        "Sunday"
+      ]
+    },
+    {
+      "name": "is_weekend",
+      "type": "INTEGER",
+      "description": "Binary flag indicating if transaction occurred on weekend. 0 for weekday, 1 for weekend (Saturday/Sunday)",
+      "example": 0,
+      "nullable": false,
+      "valid_values": [
+        "0 - Weekday (Monday to Friday)",
+        "1 - Weekend (Saturday or Sunday)"
+      ]
+    }
+  ],
+  "important_notes": [
+    "merchant_category is always NULL for P2P transactions",
+    "receiver_age_group is NULL for non-P2P transactions (P2M, Bill Payment, Recharge)",
+    "fraud_flag = 1 means flagged for review, NOT confirmed fraud",
+    "amount is in Indian Rupees (INR)",
+    "All timestamps are in 2024"
+  ],
+  "query_guidelines": [
+    "When calculating failure rates, use COUNT(*) WHERE transaction_status='FAILED' / COUNT(*) * 100",
+    "For merchant analysis, always filter WHERE merchant_category IS NOT NULL",
+    "For P2P analysis, use WHERE transaction_type='P2P'",
+    "For age group comparisons in P2P, use both sender_age_group and receiver_age_group",
+    "For fraud analysis, use fraud_flag=1 but clarify these are flagged for review, not confirmed fraud",
+    "Weekend analysis should use is_weekend=1 or day_of_week IN ('Saturday', 'Sunday')",
+    "Peak hours are typically defined as hour_of_day BETWEEN 18 AND 21"
+  ]
+}

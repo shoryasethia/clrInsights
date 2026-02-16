@@ -1,0 +1,48 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  body {
+    @apply bg-white dark:bg-[#0f0f0f] text-gray-900 dark:text-gray-100;
+  }
+
+  /* Hide scrollbar but keep scrolling */
+  .scrollbar-hidden {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+  .scrollbar-hidden::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+@layer components {
+  .btn-primary {
+    @apply bg-primary-700 hover:bg-primary-800 dark:bg-primary-600 dark:hover:bg-primary-700 text-white font-medium px-4 py-2 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed;
+  }
+  
+  .btn-icon {
+    @apply p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-[#222] transition-colors text-gray-700 dark:text-gray-300;
+  }
+  
+  .input-field {
+    @apply w-full px-4 py-3 bg-gray-50 dark:bg-[#181818] border border-gray-200 dark:border-gray-900 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 dark:focus:ring-primary-600 resize-none text-gray-900 dark:text-gray-100;
+  }
+  
+  .message {
+    @apply flex gap-3 mb-4;
+  }
+  
+  .message-content {
+    @apply flex-1 px-4 py-3 rounded-lg;
+  }
+  
+  .message-user .message-content {
+    @apply bg-primary-50 dark:bg-[#181818] text-gray-900 dark:text-gray-100;
+  }
+  
+  .message-assistant .message-content {
+    @apply bg-gray-50 dark:bg-[#181818] text-gray-900 dark:text-gray-100;
+  }
+}

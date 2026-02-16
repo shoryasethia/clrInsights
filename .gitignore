@@ -1,0 +1,73 @@
+# Virtual environment
+.venv/
+venv/
+env/
+
+# Environment variables
+.env
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+
+# Sessions (user data)
+sessions/
+
+# Distribution / packaging
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Logs
+*.log
+logs/
+
+# Database
+*.db
+*.sqlite
+
+# Test coverage
+htmlcov/
+.coverage
+.pytest_cache/
+
+# Node modules
+node_modules/
+frontend/node_modules/
+
+# Frontend build output
+frontend/dist/
+
+# Legacy / unused directories
+backend/
+
+# Data files (large CSVs should not be in repo)
+# Uncomment below if you don't want CSV in repo:
+# ../data/
